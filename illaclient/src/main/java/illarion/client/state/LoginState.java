@@ -19,6 +19,9 @@ import illarion.client.gui.controller.LoginScreenController;
 import illarion.client.gui.controller.ScreenController;
 import illarion.client.util.account.AccountSystem;
 import org.illarion.engine.BackendBinding;
+import org.illarion.engine.State;
+
+import java.util.function.Consumer;
 
 /**
  * This game state is used to display the login and character selection dialog. Also the option dialog is displayed in
@@ -28,7 +31,7 @@ public class LoginState implements GameState {
     /**
      * The screen controller that takes care for the login screen.
      */
-    private ScreenController loginController;
+    private LoginScreenController loginController;
 
     @Override
     public void create(BackendBinding binding) {
@@ -53,7 +56,12 @@ public class LoginState implements GameState {
     }
 
     @Override
-    public void enterState() {
+    public void enterState(Consumer<State> enterNextState) {
+        /*loginController.setLoginListener((loginData) -> {
+            enterNextState.accept(State.PLAYING);
+            World.getNet().sendCommand(new LoginCmd(loginData.character, loginData.password, IllaClient.APPLICATION.getApplicationVersion()));
+        });*/
+
         loginController.onStartScreen();
     }
 

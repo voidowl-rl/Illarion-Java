@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import illarion.common.config.ConfigReader;
+import illarion.common.types.CharacterId;
 import org.illarion.engine.backend.gdx.GdxRenderable;
 import org.illarion.engine.graphic.ResolutionManager;
 import org.illarion.engine.ui.*;
@@ -164,30 +165,22 @@ public class GdxLoginStage implements LoginStage, GdxRenderable {
     @Override
     // Will run in main thread
     public void loginFailed() {
-        Gdx.app.postRunnable(() -> {
-            showDialog("error", null);
-        });
+        Gdx.app.postRunnable(() -> showDialog("error", null));
     }
 
     @Override
     public void accountCreationFailed() {
-        Gdx.app.postRunnable(() -> {
-            showDialog("error", null);
-        });
+        Gdx.app.postRunnable(() -> showDialog("error", null));
     }
 
     @Override
     public void accountCreationSuccessful() {
-        Gdx.app.postRunnable(() -> {
-            showDialog("success", () -> activateTable(login));
-        });
+        Gdx.app.postRunnable(() -> showDialog("success", () -> activateTable(login)));
     }
 
     @Override
     public void characterCreationFailed() {
-        Gdx.app.postRunnable(() -> {
-            showDialog("error", null);
-        });
+        Gdx.app.postRunnable(() -> showDialog("error", null));
     }
 
     @Override
@@ -232,11 +225,11 @@ public class GdxLoginStage implements LoginStage, GdxRenderable {
     }
 
     @Override
-    public void setCharacterSelectionListener(Consumer<CharacterSelectionData> event) {
+    public void setCharacterSelectionListener(Consumer<CharacterId> event) {
         characterSelection.setOnPlayCallback(new ClickListener() {
             @Override
             public void clicked(InputEvent inputEvent, float x, float y) {
-                characterSelection.getSelectedCharacter().ifPresent(event);
+                characterSelection.getSelectedCharacter().ifPresent((character) -> event.accept(character.id));
             }
         });
     }

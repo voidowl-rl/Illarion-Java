@@ -37,10 +37,7 @@ import org.illarion.engine.sound.Music;
 import org.illarion.engine.sound.Sounds;
 import org.illarion.engine.ui.CharacterCreation;
 import org.illarion.engine.ui.UserInterface;
-import org.illarion.engine.ui.login.AccountCreationData;
-import org.illarion.engine.ui.login.CharacterCreationOptions;
-import org.illarion.engine.ui.login.CharacterSelectionData;
-import org.illarion.engine.ui.login.LoginData;
+import org.illarion.engine.ui.login.*;
 import org.illarion.engine.ui.stage.LoginStage;
 
 import java.util.Arrays;
@@ -48,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static illarion.client.gui.login.CharacterCreationOptionsConverter.convertToCharacterCreateForm;
@@ -120,13 +118,17 @@ public final class LoginScreenController implements ScreenController {
         stage.setLoginListener(this::onLoginIssued);
         stage.setOptionsData(IllaClient.getConfig(), window.getResolutionManager());
         stage.setOptionsSaveListener(LoginScreenController::saveOptions);
-        stage.setCharacterSelectionListener(this::onCharacterSelection);
         stage.setCharacterCreationListener(this::onCharacterCreationIssued);
         stage.setAccountCreationListener(this::onAccountCreationIssued);
     }
 
     @Override
     public void onEndScreen() {}
+
+    public void setLoginListener(Consumer<GameServerLoginData> loginListener) {
+        stage.setCharacterSelectionListener((characterId) ->
+                loginListener.accept(new GameServerLoginData(characterId, accountSystem.getLoginPassword())));
+    }
 
     private void onAccountCreationIssued(AccountCreationData accountCreationData) {
         accountSystem.setEndpoint(AccountSystem.OFFICIAL_ENDPOINT);
@@ -179,13 +181,6 @@ public final class LoginScreenController implements ScreenController {
                         executor));
 
         Futures.addCallback(loginRequests, new LoginFinishedCallback(), executor);
-    }
-
-    private void onCharacterSelection(CharacterSelectionData character) {
-        // call injected LeaveState
-
-        // stateManager.enterState(State.PLAYING);
-        // World.getNet().sendCommand(new LoginCmd(loginChar, getPassword(), clientVersion));
     }
 
     private void onCharacterCreationIssued(CharacterCreation characterData) {

@@ -16,6 +16,9 @@
 package illarion.client.state;
 
 import org.illarion.engine.BackendBinding;
+import org.illarion.engine.State;
+
+import java.util.function.Consumer;
 
 /**
  * This interface defines the different states the game is able to enter.
@@ -58,7 +61,7 @@ public interface GameState {
     /**
      * This function is called once the game is entered
      */
-    void enterState();
+    void enterState(Consumer<State> enterNextState);
 
     /**
      * This function is called once a formerly active state is left.

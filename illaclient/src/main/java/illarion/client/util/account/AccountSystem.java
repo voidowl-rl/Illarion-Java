@@ -74,19 +74,15 @@ public class AccountSystem implements AutoCloseable {
         endpoint = serverEndpoint;
     }
 
+    public String getLoginPassword() {
+        if (authenticator == null) return "";
+        return new String(authenticator.getPasswordAuthentication().getPassword());
+    }
+
     public Servers getCurrentServer() {
         return currentServer;
     }
 
-    /**
-     * Set the authentication that is used for the interaction with the account system.
-     *
-     * @param loginData the authentication credentials
-     * @throws IllegalStateException in case the authentication is already set
-     */
-    public void setAuthentication(@NotNull LoginData loginData) {
-        authenticator = new IllarionAuthenticator(loginData.username(), loginData.password());
-    }
 
     public void setEndpoint(String customEndpoint) {
         if (customEndpoint.equals(endpoint)) {

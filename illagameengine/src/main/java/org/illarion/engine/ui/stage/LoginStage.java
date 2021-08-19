@@ -1,6 +1,7 @@
 package org.illarion.engine.ui.stage;
 
 import illarion.common.config.ConfigReader;
+import illarion.common.types.CharacterId;
 import org.illarion.engine.graphic.ResolutionManager;
 import org.illarion.engine.ui.Action;
 import org.illarion.engine.ui.CharacterCreation;
@@ -26,7 +27,7 @@ public interface LoginStage {
     void setExitListener(Action event);
     void setLoginListener(Consumer<LoginData> event);
     void setOptionsSaveListener(Consumer<Map<String, String>> event);
-    void setCharacterSelectionListener(Consumer<CharacterSelectionData> data);
+    void setCharacterSelectionListener(Consumer<CharacterId> characterId);
     void setCharacterCreationListener(Consumer<CharacterCreation> data);
 
     void setAccountCreationListener(Consumer<AccountCreationData> event);
