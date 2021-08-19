@@ -39,6 +39,18 @@ allprojects {
     apply plugin: 'java'
     sourceCompatibility = JavaVersion.VERSION_16
     targetCompatibility = JavaVersion.VERSION_16
+    
+    plugins {
+        id "org.sonarqube" version "3.3"
+    }
+    
+    sonarqube {
+        properties {
+            property "sonar.projectKey", "r-lodahl_Illarion-Java"
+            property "sonar.organization", "r-lodahl"
+            property "sonar.host.url", "https://sonarcloud.io"
+        }
+    }
 
     if (project.hasProperty('targetRepo')) {
         ext.mavenRepo = "file://$targetRepo"
