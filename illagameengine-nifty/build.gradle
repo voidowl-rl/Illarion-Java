@@ -18,7 +18,6 @@ apply plugin: 'maven-publish'
 
 apply from: '../versions.gradle'
 
-archivesBaseName = 'illarion_engine_nifty'
 dependencies {
     api project(':common')
     api project(':engine')
@@ -26,7 +25,6 @@ dependencies {
 }
 
 jar {
-    dependsOn { gitVersion }
     manifest {
         attributes(
                 'Permissions': 'all-permissions',
@@ -39,26 +37,5 @@ jar {
                 'Implementation-Vendor': 'Illarion e.V.',
                 'Implementation-Version': project.ext.fullVersion
         )
-    }
-}
-
-task sourceJar(type: Jar) {
-    from sourceSets.main.allJava
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-
-            artifact sourceJar {
-                classifier "sources"
-            }
-        }
-    }
-    repositories {
-        maven {
-            url project.ext.mavenRepo
-        }
     }
 }

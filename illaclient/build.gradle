@@ -18,9 +18,6 @@ apply plugin: 'maven-publish'
 
 apply from: '../versions.gradle'
 
-archivesBaseName = 'illarion_client'
-mainClassName = 'illarion.client.IllaClient'
-
 dependencies {
     implementation project(':common')
     implementation project(':engine')
@@ -45,7 +42,6 @@ dependencies {
 }
 
 jar {
-    dependsOn { gitVersion }
     manifest {
         attributes(
                 'Main-Class': 'illarion.client.IllaClient',
@@ -74,25 +70,4 @@ run {
     }
 
     jvmArgs += '-Dillarion.server=devserver'
-}
-
-task sourceJar(type: Jar) {
-    from sourceSets.main.allJava
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-
-            artifact sourceJar {
-                classifier "sources"
-            }
-        }
-    }
-    repositories {
-        maven {
-            url project.ext.mavenRepo
-        }
-    }
 }

@@ -13,11 +13,8 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
-apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'maven-publish'
-
-archivesBaseName = 'illarion_build'
 
 dependencies {
     implementation project(':common')
@@ -27,7 +24,6 @@ dependencies {
 }
 
 jar {
-    dependsOn { gitVersion }
     manifest {
         attributes(
                 'Permissions': 'all-permissions',
@@ -40,26 +36,5 @@ jar {
                 'Implementation-Vendor': 'Illarion e.V.',
                 'Implementation-Version': project.ext.fullVersion
         )
-    }
-}
-
-task sourceJar(type: Jar) {
-    from sourceSets.main.allJava
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-
-            artifact sourceJar {
-                classifier "sources"
-            }
-        }
-    }
-    repositories {
-        maven {
-            url project.ext.mavenRepo
-        }
     }
 }

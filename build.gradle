@@ -13,8 +13,37 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
+wrapper {
+    gradleVersion = '7.0.2'
+}
 
-buildscript {
+allprojects {
+    apply plugin: 'idea'
+
+    def mainVersion = findProperty('mainVersion') ?: '0.0.0.1'
+    def gitBranch = findProperty('gitBranch') ?: 'local'
+    def gitHash = findProperty('gitHash') ?: 'local'
+
+    project.ext.fullVersion = mainVersion + '-' + gitHash
+    project.ext.branch = gitBranch
+    project.version =  mainVersion + (gitBranch == 'master' ? '' : '-SNAPSHOT')
+
+    configurations.all {
+        resolutionStrategy {
+            cacheDynamicVersionsFor 10 * 60, 'seconds'
+            cacheChangingModulesFor 0, 'seconds'
+        }
+    }
+}
+
+subprojects {
+    group = 'org.illarion'
+
+    apply plugin: 'java'
+    compileJava.options.encoding = 'UTF-8'
+    sourceCompatibility = JavaVersion.VERSION_16
+    targetCompatibility = JavaVersion.VERSION_16
+
     repositories {
         mavenCentral()
         maven {
@@ -23,81 +52,6 @@ buildscript {
         maven {
             url "https://plugins.gradle.org/m2/"
         }
-    }
-    dependencies {
-        classpath group: 'de.undercouch', name: 'gradle-download-task', version: '4.1.1'
-        classpath group: 'com.install4j', name: 'install4j-gradle', version: '8.0.10'
-    }
-}
-
-wrapper {
-    gradleVersion = '7.0.2'
-}
-
-allprojects {
-    apply plugin: 'idea'
-    apply plugin: 'java'
-    sourceCompatibility = JavaVersion.VERSION_16
-    targetCompatibility = JavaVersion.VERSION_16
-
-    if (project.hasProperty('targetRepo')) {
-        ext.mavenRepo = "file://$targetRepo"
-    } else {
-        ext.mavenRepo = "file://${project.buildDir}/repo"
-    }
-
-    task gitVersion { task ->
-        def gitVersion = 'unknown'
-        def branch = 'develop'
-        File rootDir = project.rootDir
-        for (def gitCmd in ['git', 'git.cmd']) {
-            try {
-                def procBranch = "$gitCmd rev-parse --abbrev-ref HEAD".execute(null as List, rootDir)
-                procBranch.waitFor()
-                branch = procBranch.in.text.trim()
-                procBranch.destroy()
-
-                def procVersion = "$gitCmd describe --tags HEAD".execute(null as List, rootDir)
-                procVersion.waitFor()
-                gitVersion = procVersion.in.text.trim()
-                procVersion.destroy()
-
-                break
-            } catch (e) {
-                logger.error('Failed to get version from Git', e)
-            }
-        }
-
-        String mainVersion
-        def indexOfSeparator = gitVersion.indexOf('-')
-        if (indexOfSeparator == -1) {
-            mainVersion = gitVersion
-        } else {
-            mainVersion = gitVersion.substring(0, indexOfSeparator)
-        }
-
-        if (branch == 'master') {
-            if (indexOfSeparator > -1) {
-                throw new RuntimeException("Can't build snapshot in master branch.")
-            }
-        } else {
-            mainVersion += '-SNAPSHOT'
-        }
-
-        task.project.version = mainVersion
-        task.project.ext.fullVersion = gitVersion
-        task.project.ext.branch = branch
-    }
-
-    configurations.all {
-        resolutionStrategy {
-            cacheDynamicVersionsFor 10 * 60, 'seconds'
-            cacheChangingModulesFor 0, 'seconds'
-        }
-    }
-
-    repositories {
-        mavenCentral()
         maven {
             url 'https://illarion.org/media/java/maven'
         }
@@ -108,38 +62,10 @@ allprojects {
             url 'https://dl.bintray.com/flowtick/jgraphx'
         }
     }
-}
 
-configure(subprojects) {
-    compileJava {
-        options.incremental = true
-        options.encoding = 'UTF-8'
-    }
-}
-
-subprojects {
-    group = 'org.illarion'
-    plugins.withType(JavaPlugin) {
-        configurations {
-            provided
-        }
-        sourceSets {
-            main.compileClasspath += configurations.provided
-            test.compileClasspath += configurations.provided
-            test.runtimeClasspath += configurations.provided
-        }
-        dependencies {
-            implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
-            implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.1'
-            implementation 'org.jetbrains:annotations:21.0.1'
-        }
-    }
-
-    idea {
-        module {
-            if (scopes.PROVIDED != null) {
-                scopes.PROVIDED.plus += configurations.provided
-            }
-        }
+    dependencies {
+        implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
+        implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.1'
+        implementation 'org.jetbrains:annotations:21.0.1'
     }
 }

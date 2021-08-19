@@ -16,10 +16,7 @@
 include "illabuild"
 include "illaclient"
 include "illacommon"
-include "illacompiler"
 include "illadownload"
-include "illaeasynpc"
-include "illaeasyquest"
 include "illagameengine"
 include "illagameengine-libgdx"
 include "illagameengine-nifty"
@@ -39,17 +36,8 @@ rootProject.children.each {
         case "illacommon":
             it.name = "common"
             break
-        case "illacompiler":
-            it.name = "compiler"
-            break
         case "illadownload":
             it.name = "download"
-            break
-        case "illaeasynpc":
-            it.name = "easynpc"
-            break
-        case "illaeasyquest":
-            it.name = "easyquest"
             break
         case "illagameengine":
             it.name = "engine"

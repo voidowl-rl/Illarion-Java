@@ -13,24 +13,19 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
-import com.install4j.gradle.Install4jTask
-
 plugins {
     id 'application'
     id 'org.openjfx.javafxplugin' version '0.0.8'
+    id "de.undercouch.download" version "4.1.2"
+    id "com.install4j.gradle" version "9.0.4"
 }
 
-apply plugin: 'java'
 apply plugin: 'maven-publish'
 apply from: '../versions.gradle'
-apply plugin: 'install4j'
 
 def hasTargetDistDir = project.hasProperty('targetDistDir')
 def hasInstall4jDir = project.hasProperty('install4jDir')
 def hasInstall4jTargetDir = project.hasProperty('install4jTargetDir')
-
-archivesBaseName = 'illarion_download'
-mainClassName = 'illarion.download.Application'
 
 dependencies {
     implementation project(':common')
@@ -44,7 +39,6 @@ dependencies {
 }
 
 jar {
-    dependsOn { gitVersion }
     manifest {
         attributes(
                 'Main-Class': 'illarion.download.Application',
@@ -66,21 +60,23 @@ jar {
     }
 }
 
-task publishDownloaderBundle() {}
+javafx {
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
+}
+
+task publishDownloaderBundle() {
+}
 
 if (hasTargetDistDir) {
     publish.dependsOn {
         publishDownloader
     }
 }
+
 if (hasInstall4jTargetDir) {
     publishDownloaderBundle.dependsOn {
         createInstall4j
     }
-}
-
-javafx {
-    modules = [ 'javafx.controls', 'javafx.fxml' ]
 }
 
 if (hasTargetDistDir) {
@@ -97,6 +93,7 @@ if (hasTargetDistDir) {
         into file(project.targetDistDir)
     }
 }
+
 if (hasInstall4jTargetDir && hasInstall4jDir) {
     task cleanUpForInstall4j(type: Delete) {
         delete new File(project.buildDir, 'install4j')
@@ -159,18 +156,5 @@ if (hasInstall4jTargetDir && hasInstall4jDir) {
         variables = [sourceDir: sourceDir,
                      iconsDir : new File(project.projectDir, 'icons'),
                      keyStore : keyStore]
-    }
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
-    }
-    repositories {
-        maven {
-            url project.ext.mavenRepo
-        }
     }
 }

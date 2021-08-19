@@ -20,9 +20,6 @@ apply plugin: 'idea'
 
 apply from: '../versions.gradle'
 
-archivesBaseName = 'illarion_easynpc'
-mainClassName = 'illarion.easynpc.gui.MainFrame'
-
 project.extensions.antlr = [
         grammarpackage: "illarion.easynpc.grammar",
         antlrSource   : 'src/main/antlr4',
@@ -88,7 +85,6 @@ compileJava {
 }
 
 jar {
-    dependsOn { gitVersion }
     manifest {
         attributes(
                  'Main-Class': 'illarion.easynpc.gui.MainFrame',
@@ -108,25 +104,4 @@ jar {
 
 clean {
     delete antlr.destinationDir
-}
-
-task sourceJar(type: Jar) {
-    from sourceSets.main.allJava
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-
-            artifact sourceJar {
-                classifier "sources"
-            }
-        }
-    }
-    repositories {
-        maven {
-            url project.ext.mavenRepo
-        }
-    }
 }
