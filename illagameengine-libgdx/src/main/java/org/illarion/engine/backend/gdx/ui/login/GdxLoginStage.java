@@ -179,7 +179,7 @@ public class GdxLoginStage implements LoginStage, GdxRenderable {
     @Override
     public void accountCreationSuccessful() {
         Gdx.app.postRunnable(() -> {
-            showDialog("success", null);
+            showDialog("success", () -> activateTable(login));
         });
     }
 

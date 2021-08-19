@@ -103,25 +103,6 @@ public class AccountSystem implements AutoCloseable {
     }
 
     @NotNull
-    private RequestHandler getRequestHandler() {
-        if (endpoint == null || endpoint.isEmpty()) {
-            throw new IllegalStateException("Communicating with the account system is not possible until the endpoint is set.");
-        }
-
-        if (requestHandler != null) {
-            return requestHandler;
-        }
-
-        synchronized (requestHandlerLock) {
-            if (requestHandler == null) {
-                requestHandler = new RequestHandler(endpoint);
-            }
-        }
-
-        return requestHandler;
-    }
-
-    @NotNull
     private IllarionAuthenticator getAuthenticator() {
         IllarionAuthenticator authenticator = this.authenticator;
         if (authenticator == null) {
@@ -163,6 +144,14 @@ public class AccountSystem implements AutoCloseable {
     }
 
     @NotNull
+    public ListenableFuture<AccountCreateResponse> createAccount(@NotNull String username, @NotNull String password) {
+        var accountCreationForm = new AccountCreateForm(username, password, null);
+        var accountCreationRequest = new AccountCreateRequest(accountCreationForm);
+
+        return getRequestHandler().sendRequestAsync(accountCreationRequest);
+    }
+
+    @NotNull
     public ListenableFuture<AccountCreateResponse> createAccount(@NotNull String username,
                                                                  @Nullable String email,
                                                                  @NotNull String password) {
@@ -194,16 +183,35 @@ public class AccountSystem implements AutoCloseable {
         return requestHandler.sendRequestAsync(request);
     }
 
+    @Override
+    public void close() throws Exception {
+        closeRequestHandler();
+    }
+
+    @NotNull
+    private RequestHandler getRequestHandler() {
+        if (endpoint == null || endpoint.isEmpty()) {
+            throw new IllegalStateException("Communicating with the account system is not possible until the endpoint is set.");
+        }
+
+        if (requestHandler != null) {
+            return requestHandler;
+        }
+
+        synchronized (requestHandlerLock) {
+            if (requestHandler == null) {
+                requestHandler = new RequestHandler(endpoint);
+            }
+        }
+
+        return requestHandler;
+    }
+
     private void closeRequestHandler() throws Exception {
         RequestHandler handler = requestHandler;
         requestHandler = null;
         if (handler != null) {
             handler.close();
         }
-    }
-
-    @Override
-    public void close() throws Exception {
-        closeRequestHandler();
     }
 }

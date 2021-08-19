@@ -147,7 +147,7 @@ public final class LoginScreenController implements ScreenController {
 
                     return accountSystem.createAccount(
                             accountCreationData.name(),
-                            accountCreationData.email(),
+                            //accountCreationData.email(), TODO: Server currently does not support account creation with mail (request throws 500)
                             accountCreationData.password());
                 },
                 executor);
